@@ -292,6 +292,10 @@ body.view-story .top,body.view-story .legal{max-width:640px}
 @media (max-width:700px){.top{justify-content:flex-start}}
 .reset{justify-self:stretch;justify-content:center;color:var(--muted)}
 
+/* capacity: over or within */
+.fit{font-size:16px;font-weight:500}
+.fit.warn{color:var(--mid)}
+
 </style>
 </head>
 <body>
@@ -313,31 +317,25 @@ body.view-story .top,body.view-story .legal{max-width:640px}
     <button class="grab" type="button" id="grab" aria-label="Make the question bigger"></button>
     <div class="qbody" id="qbody">
 
-    <!-- Which property -->
-    <div class="screen" data-s="home">
-      <h1 tabindex="-1">Property price</h1>
-      <p class="help">Pick a price or enter your own.</p>
-      <div class="homes" role="radiogroup" aria-label="Example prices" id="homes"></div>
-      <p class="note">$750,000 is the brochure example.</p>
-      <div><button class="link" type="button" id="ownPriceBtn" aria-expanded="false">Enter a price</button></div>
-      <div id="ownPrice" hidden><div class="stepper" data-key="price"></div></div>
+    <!-- Borrowing capacity: what the SMSF can afford, before choosing a property -->
+    <div class="screen" data-s="capacity">
+      <h1 tabindex="-1">Borrowing capacity</h1>
+      <div><div class="stepper" data-key="bal"></div><span class="stepper-unit">SMSF balance</span></div>
+      <div class="chips" data-chips="keep,contrib,dep,rate,term"></div>
+      <div class="sum"><span class="k">Max property price</span><span class="v" id="capFig" aria-live="polite"></span></div>
+      <p class="say" id="capSay" aria-live="polite"></p>
+      <p class="help" id="capLimit"></p>
+      <p class="note">Day-one costs must fit in the balance. Top-ups must be covered by contributions and cash left over. Estimate only: the fund's servicing calculation and the lender decide.</p>
     </div>
 
-    <!-- Deposit -->
-    <div class="screen" data-s="deposit" hidden>
-      <h2 tabindex="-1">Deposit</h2>
-      <div><div class="stepper" data-key="dep"></div><span class="stepper-unit">of the price (20% to 80%)</span></div>
-      <p class="say" id="depSay" aria-live="polite"></p>
-    </div>
-
-    <!-- Loan -->
-    <div class="screen" data-s="loan" hidden>
-      <h2 tabindex="-1">Loan</h2>
-      <p class="fig" id="loanFig"></p>
-      <p class="say" id="loanSay"></p>
-      <p class="help" id="repaySay"></p>
-      <div class="chips" data-chips="rate,term"></div>
-      <p class="note">7.25% fixed for the full term (brochure). Subject to lender approval.</p>
+    <!-- The property, chosen against the capacity -->
+    <div class="screen" data-s="home" hidden>
+      <h2 tabindex="-1">Property price</h2>
+      <div class="stepper" data-key="price"></div>
+      <p class="fit" id="fitSay" aria-live="polite"></p>
+      <div><button class="link" type="button" id="useMax" hidden></button></div>
+      <p class="say" id="priceSay" aria-live="polite"></p>
+      <p class="note">$750,000 is the brochure example. 7.25% fixed for the full term. Subject to lender approval.</p>
     </div>
 
     <!-- Up front: every cost, with where each figure comes from -->
@@ -354,11 +352,7 @@ body.view-story .top,body.view-story .legal{max-width:640px}
       </div>
       <div class="costs" id="costs"></div>
       <p class="notice" id="estNotice"></p>
-      <div class="cash">
-        <label for="cash">SMSF cash available (optional)</label>
-        <div class="money-in"><span aria-hidden="true">$</span><input id="cash" inputmode="numeric" autocomplete="off" placeholder="0"></div>
-        <p class="cash-say" id="cashSay" aria-live="polite"></p>
-      </div>
+      <p class="cash-say" id="cashSay" aria-live="polite"></p>
       <div class="copyrow"><button class="btn2" type="button" id="copyList">Copy this list</button><span class="note" id="copyStatus" role="status"></span></div>
     </div>
 
@@ -390,8 +384,9 @@ body.view-story .top,body.view-story .legal{max-width:640px}
         <div class="sum"><span class="k" id="rBackK">Equity</span><span class="v" id="rBack"></span><span class="s" id="rBackSub"></span></div>
       </div>
       <p class="diff" id="rDiff"></p>
-      <p class="cash-say" id="rCash" hidden></p>
+      <p class="cash-say" id="rCash"></p>
       <div class="links">
+        <button class="link" type="button" data-jump="capacity">Borrowing capacity</button>
         <button class="link" type="button" data-jump="upfront">Day-one costs</button>
         <button class="link" type="button" data-sheet="sale">How it’s calculated</button>
         <button class="link" type="button" data-sheet="fees">Fees</button>
@@ -434,7 +429,7 @@ body.view-story .top,body.view-story .legal{max-width:640px}
 </main>
 
 <footer class="legal">
-  <p>Illustrative only. Figures follow the Residential Property Fund brochure for Australian Residential Group (ARG) partners, based on the Product Disclosure Statement dated 13 October 2026, and the assumptions you set: a fixed interest rate for the full term, rent after property costs rising each year, fees unchanged and full occupancy. Stamp duty uses Queensland or Victorian general rates. Tax, vacancy, sale costs and the wind-up fee are left out unless shown. Your SMSF holds units in the fund, not the property, and its return depends on both Classes (about 49% Single Property Class, 51% SMSF Property Class), fees and tax. Past growth is not a reliable indicator of future growth. Values can fall and you can lose money. The setup, annual and wind-up fees are exclusive fees for ARG partners; fund fees and costs are set out in the PDS.</p>
+  <p>Illustrative only. Figures follow the Residential Property Fund brochure for Australian Residential Group (ARG) partners, based on the Product Disclosure Statement dated 13 October 2026, and the assumptions you set: a fixed interest rate for the full term, rent after property costs rising each year, fees unchanged and full occupancy. Stamp duty uses Queensland or Victorian general rates. Tax, vacancy, sale costs and the wind-up fee are left out unless shown. Borrowing capacity is an estimate; the fund’s servicing calculation and the lender decide what can be borrowed. Your SMSF holds units in the fund, not the property, and its return depends on both Classes (about 49% Single Property Class, 51% SMSF Property Class), fees and tax. Past growth is not a reliable indicator of future growth. Values can fall and you can lose money. The setup, annual and wind-up fees are exclusive fees for ARG partners; fund fees and costs are set out in the PDS.</p>
   <p>General information only. It does not take into account your objectives, financial situation or needs. Read the Product Disclosure Statement (13 October 2026) and Target Market Determination at <a href="https://www.lonvera.com.au" target="_blank" rel="noopener">www.lonvera.com.au</a> and get independent financial, legal and tax advice before investing. Issued by Rajomon Capital Limited ACN 600 237 625, AFSL 465579, as responsible entity of the Rajomon Fund ARSN 664 946 801. Lonvera Pty Ltd ACN 654 721 043, Authorised Representative No. 1303714, is the investment manager.</p>
 </footer>
 
@@ -521,16 +516,12 @@ const ESTIMATES=["lender","other"];
 /* Brochure figures an admin may change: once changed they show as changed. */
 const ADMIN=["setup","annual","windUp","rate","loanYears","rg"];
 
-const HOMES=[
-  {price:600000,type:"Townhouse"},
-  {price:750000,type:"Townhouse (brochure example)"},
-  {price:900000,type:"House"}
-];
-const defaultRent=p=>p*RENT_YIELD/52;
-const S={price:750000,state:"QLD",dep:BROCHURE.dep,rent:defaultRent(750000),rate:BROCHURE.rate,loanYears:BROCHURE.loanYears,rg:BROCHURE.rg,growth:3,years:10,
+const defaultRent=p=>p*S.yieldPct/100/52;
+const S={bal:350000,keep:12,contrib:20000,topYears:5,yieldPct:RENT_YIELD*100,priceSet:false,
+  price:750000,state:"QLD",dep:BROCHURE.dep,rent:750000*RENT_YIELD/52,rate:BROCHURE.rate,loanYears:BROCHURE.loanYears,rg:BROCHURE.rg,growth:3,years:10,
   dutyOn:"full",landValue:375000,lender:0,other:0,setup:BROCHURE.setup,annual:BROCHURE.annual,windUp:BROCHURE.windUp,cash:null,edited:{}};
-const SCREENS=["home","deposit","loan","upfront","rent","years","result"];
-let cur=0, busy=false, R=null;
+const SCREENS=["capacity","home","upfront","rent","years","result"];
+let cur=0, busy=false, R=null, CAP=null;
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $=id=>document.getElementById(id);
 const el=html=>{const t=document.createElement("template"); t.innerHTML=html.trim(); return t.content.firstElementChild;};
@@ -568,13 +559,40 @@ function compute(s){
     debtFreeValue:price*Math.pow(1+s.growth/100,s.loanYears)};
 }
 
+/* ---------- borrowing capacity: the highest price the SMSF can afford ---------- */
+// Two tests, both from the client's SMSF:
+//  1. Day one: deposit, stamp duty, setup fee, cash reserve and any quotes entered must fit in the balance,
+//     less the share kept in the SMSF.
+//  2. Top-ups: the monthly shortfall (repayments + annual fee - rent) for the first topYears years must be covered by
+//     yearly contributions plus the cash left after day one. The fund's servicing calculation and the lender decide the real figure.
+function testPrice(s,p){
+  const t=Object.assign({},s,{price:p,rent:p*s.yieldPct/100/52,landValue:Math.round(p/2/5000)*5000});
+  const c=compute(t), avail=s.bal*(1-s.keep/100), left=avail-c.day1;
+  let tops=0; for(let i=0;i<s.topYears;i++) tops+=c.years[i].top;
+  return {c, avail, left, tops, cashOk:left>=0, topOk:left+s.contrib*s.topYears>=tops};
+}
+function capacity(s){
+  const avail=s.bal*(1-s.keep/100);
+  let best=null;
+  for(let p=3000000;p>=100000;p-=5000){ const t=testPrice(s,p); if(t.cashOk&&t.topOk){ best={price:p,...t}; break; } }
+  if(!best) return {price:0,loan:0,avail,limit:"cash",repay:0};
+  const up=testPrice(s,best.price+5000);
+  const limit=best.price>=3000000?"max":!up.cashOk?"cash":"topups";
+  return {price:best.price,loan:best.c.loan,repay:best.c.repay,day1:best.c.day1,avail,left:best.left,tops:best.tops,limit};
+}
+
 /* ---------- blur swap for changing text (money never counts up) ---------- */
 function put(el,html){ if(!el||el.innerHTML===html) return; el.innerHTML=html; if(!reduce){el.classList.remove("swap"); void el.offsetWidth; el.classList.add("swap");} }
 
 /* ---------- steppers and chips ---------- */
 const META={
+  bal:{min:50000,max:5000000,step:5000,fmt:v=>money(v),label:"SMSF balance"},
+  keep:{min:0,max:50,step:1,fmt:v=>v+"% kept in the SMSF",label:"Kept in the SMSF"},
+  contrib:{min:0,max:100000,step:1000,fmt:v=>money(v)+" a year in contributions",label:"Contributions a year"},
+  topYears:{min:1,max:10,step:1,fmt:v=>"Top-ups covered for "+v+(v===1?" year":" years"),label:"Years of top-ups to cover"},
+  yieldPct:{min:2,max:8,step:.1,fmt:v=>num(v)+"% rent yield",label:"Rent yield after costs"},
   price:{min:200000,max:3000000,step:5000,fmt:v=>money(v),label:"Purchase price"},
-  dep:{min:20,max:80,step:5,fmt:v=>v+"%",label:"Deposit"},
+  dep:{min:20,max:80,step:5,fmt:v=>v+"% deposit",label:"Deposit"},
   rent:{min:100,max:3000,step:5,fmt:v=>money(v),label:"Rent a week"},
   rate:{min:3,max:10,step:.25,fmt:v=>num(v)+"% interest",label:"Interest rate"},
   term:{fixed:true,fmt:()=>S.loanYears+"-year loan, principal and interest"},
@@ -595,7 +613,8 @@ function set(k,v){
   if(ESTIMATES.includes(k)||ADMIN.includes(k)) S.edited[k]=true;
   if(k==="rent") S.rentEdited=true;
   if(k==="landValue") S.landEdited=true;
-  if(k==="price") followPrice();
+  if(k==="price"){ S.priceSet=true; followPrice(); }
+  if(k==="yieldPct") followPrice();
   update();
 }
 // Until someone enters their own, rent is 4.5% of the price after costs (the brochure's assumption) and the land is half of it.
@@ -655,22 +674,25 @@ document.addEventListener("click",e=>{
   if(st){S.state=st.dataset.state; update(); if($("setupView").hidden===false) buildSetup();}
 });
 
-/* ---------- homes ---------- */
-$("homes").innerHTML=HOMES.map((h,i)=>'<label class="home"><input type="radio" name="home" value="'+i+'"'+(h.price===S.price?" checked":"")+'><b>'+money(h.price)+'</b><small>'+h.type+'</small></label>').join("");
-$("homes").addEventListener("change",e=>{const h=HOMES[+e.target.value]; S.price=h.price; followPrice(); update();});
-$("ownPriceBtn").onclick=function(){const box=$("ownPrice"); box.hidden=!box.hidden; this.setAttribute("aria-expanded",String(!box.hidden)); if(!box.hidden) $("in-price").focus();};
+$("useMax").onclick=()=>{ if(CAP.price){ set("price",CAP.price); } };
 
 /* ---------- render ---------- */
 function update(){
   R=compute(S);
   const c=R;
   paintSteppers(); paintChips(); paintOpts();
-  document.querySelectorAll('#homes input').forEach((r,i)=>{r.checked=HOMES[i].price===S.price;});
-  if(!HOMES.some(h=>h.price===S.price)){ $("ownPrice").hidden=false; $("ownPriceBtn").setAttribute("aria-expanded","true"); }
-  put($("depSay"),'Deposit <b>'+money(c.dep)+'</b>. Loan <b>'+money(c.loan)+'</b> ('+(100-S.dep)+'% LVR).');
-  put($("loanFig"),money(c.loan));
-  put($("loanSay"),'The fund takes the loan, not your SMSF.');
-  put($("repaySay"),'Repayments <b>'+money(c.repay)+'</b> a month over '+S.loanYears+' years.');
+  CAP=capacity(S);
+  put($("capFig"),CAP.price?money(CAP.price):"None");
+  put($("capSay"),CAP.price
+    ?'Loan up to <b>'+money(CAP.loan)+'</b> ('+(100-S.dep)+'% LVR). Repayments <b>'+money(CAP.repay)+'</b> a month. Day one <b>'+money(CAP.day1)+'</b> from <b>'+money(CAP.avail)+'</b> available.'
+    :'The balance does not cover day one at the lowest price.');
+  put($("capLimit"),CAP.limit==="cash"?'Limited by: cash for day one.':CAP.limit==="topups"?'Limited by: top-ups over '+S.topYears+(S.topYears===1?' year':' years')+'.':CAP.limit==="max"?'Above $3,000,000.':'');
+  const over=S.price-CAP.price;
+  put($("priceSay"),'Deposit <b>'+money(c.dep)+'</b>. Loan <b>'+money(c.loan)+'</b>. Repayments <b>'+money(c.repay)+'</b> a month.');
+  put($("fitSay"),!CAP.price?'Over capacity.':over===0?'At the max.':over<0?'Within capacity. <b>'+money(-over)+'</b> under the max.':'Over capacity by <b>'+money(over)+'</b>.');
+  $("fitSay").classList.toggle("warn",over>0);
+  $("useMax").hidden=!CAP.price||S.price===CAP.price;
+  $("useMax").textContent="Use the max ("+money(CAP.price)+")";
   paintUpfront(c);
   const m=c.m1, costs=m.repay+m.fee;
   put($("rentSay"),m.net<0
@@ -684,7 +706,7 @@ function update(){
   put($("rBack"),money(c.equity));
   const others=[0,3,6].filter(g=>g!==S.growth);
   put($("rBackSub"),'Value '+thousand(c.end.value)+' minus loan '+thousand(c.end.loan)+'. '+others.map(g=>'At '+g+'%: '+money(c.equityAt(g))).join('. ')+'.');
-  const cs=cashLine(c); $("rCash").hidden=!cs; if(cs) put($("rCash"),'Cash '+money(S.cash)+': '+cs);
+  put($("rCash"),'Available '+money(S.bal*(1-S.keep/100))+': '+cashLine(c));
   const net=c.equity-c.putIn;
   put($("rDiff"),'Equity minus total put in: <b>'+(net>=0?'+':'−')+money(Math.abs(net))+'</b>. Before tax, sale costs and the wind-up fee.');
   if(!$("setupView").hidden) paintSetup();
@@ -716,22 +738,19 @@ function paintUpfront(c){
   const left=ESTIMATES.filter(k=>!S.edited[k]).length;
   $("estNotice").className="notice"+(left?"":" done");
   $("estNotice").innerHTML='<i aria-hidden="true"></i><span>'+(left?'Lender and other costs are not in the brochure. Add quotes before committing.':'All costs included.')+'</span>';
-  $("cashSay").innerHTML=cashLine(c);
+  $("cashSay").innerHTML='Available '+money(S.bal*(1-S.keep/100))+' ('+money(S.bal)+' less '+S.keep+'% kept): '+cashLine(c);
 }
 // Arithmetic against the cash entered. It makes no judgement about whether the purchase suits the fund.
 function cashLine(c){
-  if(S.cash==null) return "";
-  const left=S.cash-c.day1;
+  const avail=S.bal*(1-S.keep/100), left=avail-c.day1;
   if(left<0) return 'Short <b>'+money(-left)+'</b> for day one.';
   if(c.top1<=0) return '<b>'+money(left)+'</b> left after day one.';
-  // Count whole years the cash covers, using each year's projected top-up (they change as rent and costs move).
+  // Count whole years the cash and contributions cover, using each year's projected top-up.
   let rest=left, yrs=0;
-  for(const y of c.years){ if(rest<y.top) break; rest-=y.top; yrs++; }
-  if(yrs===c.years.length) return '<b>'+money(left)+'</b> left after day one. Covers every projected top-up.';
-  return '<b>'+money(left)+'</b> left after day one. Covers '+(yrs<1?'under 1 year':yrs+(yrs===1?' year':' years'))+' of projected top-ups.';
+  for(const y of c.years){ rest+=S.contrib; if(rest<y.top) break; rest-=y.top; yrs++; }
+  if(yrs===c.years.length) return '<b>'+money(left)+'</b> left after day one. With contributions, covers every projected top-up.';
+  return '<b>'+money(left)+'</b> left after day one. With contributions, covers '+(yrs<1?'under 1 year':yrs+(yrs===1?' year':' years'))+' of projected top-ups.';
 }
-$("cash").addEventListener("input",e=>{const d=e.target.value.replace(/[^0-9]/g,""); S.cash=d?+d:null; R=compute(S); paintUpfront(R);});
-$("cash").addEventListener("blur",e=>{ if(S.cash!=null) e.target.value=S.cash.toLocaleString("en-AU"); update(); });
 $("copyList").addEventListener("click",()=>{
   const c=R;
   const text=["Up-front costs: "+money(S.price)+" property in "+STATES[S.state].name+", "+S.dep+"% deposit ("+(100-S.dep)+"% LVR)",""]
@@ -808,17 +827,15 @@ House.reset();
 
 /* ---------- the story so far: each answer becomes a line you can tap to change ---------- */
 const ROWS={
+  capacity:()=>["Max price",CAP.price?money(CAP.price):"None"],
   home:()=>["Price",money(S.price)],
-  deposit:()=>["Deposit",money(R.dep)+" ("+S.dep+"%)"],
-  loan:()=>["Loan",money(R.loan)],
   upfront:()=>["Day one",money(R.day1)],
   rent:()=>["Rent",money(S.rent)+" a week"],
   years:()=>["Growth",num(S.growth)+"% for "+S.years+" years"]
 };
 // What travels up into the story when you continue
 function flyFrom(s){
-  if(s==="home"){ const i=HOMES.findIndex(h=>h.price===S.price); return i>=0?$("homes").children[i].querySelector("b"):$("in-price"); }
-  return {deposit:$("in-dep"),loan:$("loanFig"),upfront:$("day1"),rent:$("in-rent"),years:$("yrsFig")}[s];
+  return {capacity:$("capFig"),home:$("in-price"),upfront:$("day1"),rent:$("in-rent"),years:$("yrsFig")}[s];
 }
 function show(k){
   document.querySelectorAll(".screen").forEach(sc=>{sc.hidden=sc.dataset.s!==SCREENS[k];});
@@ -873,6 +890,7 @@ async function forward(){
   House.to(cur+1);  // the answer lands, and the house steps up onto it
   gsap.set(sceneOut,{opacity:1,y:0});
   cur++;
+  if(SCREENS[cur]==="home"&&!S.priceSet&&CAP.price){ S.price=CAP.price; followPrice(); update(); }
   settleSheet();
   await show(cur);
   busy=false; $("next").disabled=false;
@@ -937,12 +955,13 @@ function restart(){
 $("next").addEventListener("click",forward);
 
 /* ---------- the adviser's set-up: every figure in one place ---------- */
-const SRC={price:"",landValue:"Dual contract only",dep:"Of the price",
+const SRC={bal:"",keep:"Not used for this purchase",contrib:"After contributions tax",topYears:"Brochure minimum term is 5 years",yieldPct:"brochure|4.5% of price after costs",price:"",landValue:"Dual contract only",dep:"Of the price",
   rate:"brochure|7.25% for the full term",loanYears:"brochure|25 years, principal and interest",
   lender:"est",other:"est",setup:"brochure|ARG partner fee, $3,500 + GST, p.12",
   rent:"After costs. Default 4.5% of price",rg:"brochure|3% a year",annual:"brochure|$4,500 + GST a year, p.12",
   growth:"Not guaranteed",years:"",windUp:"brochure|0.55% of gross asset value, p.12"};
 const GROUPS=[
+  ["Borrowing capacity",["bal","keep","contrib","topYears","yieldPct","=cap","=capLoan","=capLimit"]],
   ["Property",["price","=state","=dutyOn","landValue"]],
   ["Deposit and loan",["dep","=loan","rate","loanYears","=repay"]],
   ["Day-one costs",["=duty","setup","=reserve","lender","other","=day1"]],
@@ -950,6 +969,9 @@ const GROUPS=[
   ["Growth and exit",["growth","years","windUp","=windUpAmt"]]
 ];
 const CALC={
+  cap:()=>["Max property price",CAP.price?money(CAP.price):"None","Calculated"],
+  capLoan:()=>["Max loan",money(CAP.loan),"Calculated"],
+  capLimit:()=>["Limited by",CAP.limit==="cash"?"Day-one cash":CAP.limit==="topups"?"Top-ups":"None","Calculated"],
   loan:()=>["Loan",money(R.loan),"Calculated"],
   repay:()=>["Repayments a month",money(R.repay),"Calculated"],
   duty:()=>["Stamp duty",money(R.duty),'<span class="tag law">Law</span>'+STATES[S.state].name+' rates'],
@@ -959,7 +981,7 @@ const CALC={
   windUpAmt:()=>["Wind-up fee",money(R.windUpAmt),"At year "+S.years+" value"]
 };
 // Each figure shows in its own units, so nobody reads 750000 or 7.25 without knowing what it is.
-const UNITS={price:["$",""],landValue:["$",""],lender:["$",""],other:["$",""],setup:["$",""],annual:["$","a year"],
+const UNITS={bal:["$",""],contrib:["$","a year"],keep:["","%"],topYears:["","years"],yieldPct:["","%"],price:["$",""],landValue:["$",""],lender:["$",""],other:["$",""],setup:["$",""],annual:["$","a year"],
   rent:["$","a week"],dep:["","%"],rate:["","%"],growth:["","%"],rg:["","%"],windUp:["","%"],loanYears:["","years"],years:["","years"]};
 const fieldVal=k=>UNITS[k]&&UNITS[k][0]==="$"?money(S[k]):num(S[k]);
 function srcHtml(k){
@@ -985,6 +1007,8 @@ function paintSetup(){
   document.querySelectorAll("#groups input[data-k]").forEach(i=>{ if(document.activeElement!==i) i.value=fieldVal(i.dataset.k); });
   document.querySelectorAll("[data-src]").forEach(x=>{x.innerHTML=srcHtml(x.dataset.src);});
   $("summary").innerHTML='<h3>Client result</h3>'+
+    '<div class="kv"><span>Max price</span><b>'+(CAP.price?money(CAP.price):'None')+'</b></div>'+
+    '<div class="kv"><span>Price</span><b>'+money(S.price)+(S.price>CAP.price?' (over)':'')+'</b></div>'+
     '<div class="kv"><span>Day one</span><b>'+money(c.day1)+'</b></div>'+
     '<div class="kv"><span>Top-up, year 1</span><b>'+(c.top1>0?money(c.top1)+' a month':'None')+'</b></div>'+
     '<div class="kv"><span>Total put in, '+S.years+' years</span><b>'+money(c.putIn)+'</b></div>'+
@@ -997,7 +1021,7 @@ $("resetFees").addEventListener("click",()=>{ ADMIN.forEach(k=>{S[k]=BROCHURE[k]
 $("groups").addEventListener("change",e=>{const k=e.target.dataset.k; if(!k) return; const v=parseFloat(e.target.value.replace(/[^0-9.]/g,"")); if(!isNaN(v)) set(k,v); else paintSetup(); if(k==="price") buildSetup();});
 $("groups").addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target.dataset.k){ e.preventDefault(); e.target.blur(); } });
 const slots={};
-const CMP=[["Price",s=>money(s.S.price)],["State",s=>s.S.state],["Deposit",s=>s.S.dep+"%"],["Rate",s=>num(s.S.rate)+"%"],["Rent a week",s=>money(s.S.rent)],["Growth",s=>num(s.S.growth)+"%"],["Look ahead",s=>s.S.years+" years"],
+const CMP=[["Balance",s=>money(s.S.bal)],["Max price",s=>money(capacity(s.S).price)],["Price",s=>money(s.S.price)],["State",s=>s.S.state],["Deposit",s=>s.S.dep+"%"],["Rate",s=>num(s.S.rate)+"%"],["Rent a week",s=>money(s.S.rent)],["Growth",s=>num(s.S.growth)+"%"],["Look ahead",s=>s.S.years+" years"],
   ["Day one",s=>money(s.c.day1)],["Top-up, year 1",s=>s.c.top1>0?money(s.c.top1):"None"],["Put in",s=>money(s.c.putIn)],["Equity",s=>money(s.c.equity)]];
 document.querySelectorAll("[data-save]").forEach(b=>b.addEventListener("click",()=>{
   slots[b.dataset.save]={S:JSON.parse(JSON.stringify(S)),c:compute(S)};
@@ -1094,7 +1118,7 @@ document.body.classList.add("view-story");
 fitPhone();
 update();
 show(0);
-window.__journey={S,compute,go:k=>back(k)};
+window.__journey={S,compute,capacity,go:k=>back(k)};
 })();
 
 </script>
