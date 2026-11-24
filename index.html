@@ -321,11 +321,12 @@ body.view-story .top,body.view-story .legal{max-width:640px}
     <div class="screen" data-s="capacity">
       <h1 tabindex="-1">Borrowing capacity</h1>
       <div><div class="stepper" data-key="bal"></div><span class="stepper-unit">SMSF balance</span></div>
-      <div class="chips" data-chips="keep,contrib,dep,rate,term"></div>
+      <div><div class="stepper" data-key="wage"></div><span class="stepper-unit">Wages a year, all members</span></div>
+      <div class="chips" data-chips="sgPct,dep,rate,term"></div>
       <div class="sum"><span class="k">Max property price</span><span class="v" id="capFig" aria-live="polite"></span></div>
       <p class="say" id="capSay" aria-live="polite"></p>
       <p class="help" id="capLimit"></p>
-      <p class="note">Day-one costs must fit in the balance. Top-ups must be covered by contributions and cash left over. Estimate only: the fund's servicing calculation and the lender decide.</p>
+      <p class="note">Day-one costs must fit in the SMSF balance. The year-1 top-up must be covered by 12% of wages. Estimate only: the fund's servicing calculation and the lender decide.</p>
     </div>
 
     <!-- The property, chosen against the capacity -->
@@ -517,7 +518,7 @@ const ESTIMATES=["lender","other"];
 const ADMIN=["setup","annual","windUp","rate","loanYears","rg"];
 
 const defaultRent=p=>p*S.yieldPct/100/52;
-const S={bal:350000,keep:12,contrib:20000,topYears:5,yieldPct:RENT_YIELD*100,priceSet:false,
+const S={bal:350000,wage:140000,sgPct:12,yieldPct:RENT_YIELD*100,priceSet:false,
   price:750000,state:"QLD",dep:BROCHURE.dep,rent:750000*RENT_YIELD/52,rate:BROCHURE.rate,loanYears:BROCHURE.loanYears,rg:BROCHURE.rg,growth:3,years:10,
   dutyOn:"full",landValue:375000,lender:0,other:0,setup:BROCHURE.setup,annual:BROCHURE.annual,windUp:BROCHURE.windUp,cash:null,edited:{}};
 const SCREENS=["capacity","home","upfront","rent","years","result"];
@@ -561,21 +562,20 @@ function compute(s){
 
 /* ---------- borrowing capacity: the highest price the SMSF can afford ---------- */
 // Two tests, both from the client's SMSF:
-//  1. Day one: deposit, stamp duty, setup fee, cash reserve and any quotes entered must fit in the balance,
-//     less the share kept in the SMSF.
-//  2. Top-ups: the monthly shortfall (repayments + annual fee - rent) for the first topYears years must be covered by
-//     yearly contributions plus the cash left after day one. The fund's servicing calculation and the lender decide the real figure.
+//  1. Day one: deposit, stamp duty, setup fee, cash reserve and any quotes entered must fit in the SMSF balance.
+//  2. Servicing: the year-1 shortfall (repayments + annual fee - rent) must be covered by 12% of the client's wages,
+//     the super contributions that flow into the SMSF. The fund's servicing calculation and the lender decide the real figure.
+const serv=s=>s.wage*s.sgPct/100;  // yearly servicing from wages
 function testPrice(s,p){
   const t=Object.assign({},s,{price:p,rent:p*s.yieldPct/100/52,landValue:Math.round(p/2/5000)*5000});
-  const c=compute(t), avail=s.bal*(1-s.keep/100), left=avail-c.day1;
-  let tops=0; for(let i=0;i<s.topYears;i++) tops+=c.years[i].top;
-  return {c, avail, left, tops, cashOk:left>=0, topOk:left+s.contrib*s.topYears>=tops};
+  const c=compute(t), avail=s.bal, left=avail-c.day1, tops=c.years[0].top;
+  return {c, avail, left, tops, cashOk:left>=0, topOk:serv(s)>=tops};
 }
 function capacity(s){
-  const avail=s.bal*(1-s.keep/100);
+  const avail=s.bal;
   let best=null;
   for(let p=3000000;p>=100000;p-=5000){ const t=testPrice(s,p); if(t.cashOk&&t.topOk){ best={price:p,...t}; break; } }
-  if(!best) return {price:0,loan:0,avail,limit:"cash",repay:0};
+  if(!best){ const lo=testPrice(s,100000); return {price:0,loan:0,avail,limit:lo.cashOk?"topups":"cash",repay:0}; }
   const up=testPrice(s,best.price+5000);
   const limit=best.price>=3000000?"max":!up.cashOk?"cash":"topups";
   return {price:best.price,loan:best.c.loan,repay:best.c.repay,day1:best.c.day1,avail,left:best.left,tops:best.tops,limit};
@@ -587,9 +587,8 @@ function put(el,html){ if(!el||el.innerHTML===html) return; el.innerHTML=html; i
 /* ---------- steppers and chips ---------- */
 const META={
   bal:{min:50000,max:5000000,step:5000,fmt:v=>money(v),label:"SMSF balance"},
-  keep:{min:0,max:50,step:1,fmt:v=>v+"% kept in the SMSF",label:"Kept in the SMSF"},
-  contrib:{min:0,max:100000,step:1000,fmt:v=>money(v)+" a year in contributions",label:"Contributions a year"},
-  topYears:{min:1,max:10,step:1,fmt:v=>"Top-ups covered for "+v+(v===1?" year":" years"),label:"Years of top-ups to cover"},
+  wage:{min:0,max:1000000,step:5000,fmt:v=>money(v),label:"Wages a year"},
+  sgPct:{min:0,max:30,step:.5,fmt:v=>num(v)+"% of wages for servicing",label:"Share of wages for servicing"},
   yieldPct:{min:2,max:8,step:.1,fmt:v=>num(v)+"% rent yield",label:"Rent yield after costs"},
   price:{min:200000,max:3000000,step:5000,fmt:v=>money(v),label:"Purchase price"},
   dep:{min:20,max:80,step:5,fmt:v=>v+"% deposit",label:"Deposit"},
@@ -684,9 +683,9 @@ function update(){
   CAP=capacity(S);
   put($("capFig"),CAP.price?money(CAP.price):"None");
   put($("capSay"),CAP.price
-    ?'Loan up to <b>'+money(CAP.loan)+'</b> ('+(100-S.dep)+'% LVR). Repayments <b>'+money(CAP.repay)+'</b> a month. Day one <b>'+money(CAP.day1)+'</b> from <b>'+money(CAP.avail)+'</b> available.'
-    :'The balance does not cover day one at the lowest price.');
-  put($("capLimit"),CAP.limit==="cash"?'Limited by: cash for day one.':CAP.limit==="topups"?'Limited by: top-ups over '+S.topYears+(S.topYears===1?' year':' years')+'.':CAP.limit==="max"?'Above $3,000,000.':'');
+    ?'Loan up to <b>'+money(CAP.loan)+'</b> ('+(100-S.dep)+'% LVR). Repayments <b>'+money(CAP.repay)+'</b> a month. Day one <b>'+money(CAP.day1)+'</b>. Servicing <b>'+money(serv(S)/12)+'</b> a month ('+num(S.sgPct)+'% of wages).'
+    :CAP.limit==="topups"?'Wages don\'t cover the top-ups at this deposit. Try a bigger deposit.':'The balance doesn\'t cover day one at the lowest price.');
+  put($("capLimit"),CAP.limit==="cash"?'Limited by: cash for day one.':CAP.limit==="topups"?'Limited by: servicing.':CAP.limit==="max"?'Above $3,000,000.':'');
   const over=S.price-CAP.price;
   put($("priceSay"),'Deposit <b>'+money(c.dep)+'</b>. Loan <b>'+money(c.loan)+'</b>. Repayments <b>'+money(c.repay)+'</b> a month.');
   put($("fitSay"),!CAP.price?'Over capacity.':over===0?'At the max.':over<0?'Within capacity. <b>'+money(-over)+'</b> under the max.':'Over capacity by <b>'+money(over)+'</b>.');
@@ -706,7 +705,7 @@ function update(){
   put($("rBack"),money(c.equity));
   const others=[0,3,6].filter(g=>g!==S.growth);
   put($("rBackSub"),'Value '+thousand(c.end.value)+' minus loan '+thousand(c.end.loan)+'. '+others.map(g=>'At '+g+'%: '+money(c.equityAt(g))).join('. ')+'.');
-  put($("rCash"),'Available '+money(S.bal*(1-S.keep/100))+': '+cashLine(c));
+  put($("rCash"),'SMSF balance '+money(S.bal)+': '+cashLine(c));
   const net=c.equity-c.putIn;
   put($("rDiff"),'Equity minus total put in: <b>'+(net>=0?'+':'−')+money(Math.abs(net))+'</b>. Before tax, sale costs and the wind-up fee.');
   if(!$("setupView").hidden) paintSetup();
@@ -738,18 +737,18 @@ function paintUpfront(c){
   const left=ESTIMATES.filter(k=>!S.edited[k]).length;
   $("estNotice").className="notice"+(left?"":" done");
   $("estNotice").innerHTML='<i aria-hidden="true"></i><span>'+(left?'Lender and other costs are not in the brochure. Add quotes before committing.':'All costs included.')+'</span>';
-  $("cashSay").innerHTML='Available '+money(S.bal*(1-S.keep/100))+' ('+money(S.bal)+' less '+S.keep+'% kept): '+cashLine(c);
+  $("cashSay").innerHTML='SMSF balance '+money(S.bal)+': '+cashLine(c);
 }
 // Arithmetic against the cash entered. It makes no judgement about whether the purchase suits the fund.
 function cashLine(c){
-  const avail=S.bal*(1-S.keep/100), left=avail-c.day1;
+  const left=S.bal-c.day1;
   if(left<0) return 'Short <b>'+money(-left)+'</b> for day one.';
   if(c.top1<=0) return '<b>'+money(left)+'</b> left after day one.';
-  // Count whole years the cash and contributions cover, using each year's projected top-up.
+  // Whole years the leftover cash plus servicing from wages cover, using each year's projected top-up.
   let rest=left, yrs=0;
-  for(const y of c.years){ rest+=S.contrib; if(rest<y.top) break; rest-=y.top; yrs++; }
-  if(yrs===c.years.length) return '<b>'+money(left)+'</b> left after day one. With contributions, covers every projected top-up.';
-  return '<b>'+money(left)+'</b> left after day one. With contributions, covers '+(yrs<1?'under 1 year':yrs+(yrs===1?' year':' years'))+' of projected top-ups.';
+  for(const y of c.years){ rest+=serv(S); if(rest<y.top) break; rest-=y.top; yrs++; }
+  if(yrs===c.years.length) return '<b>'+money(left)+'</b> left after day one. With wages, covers every projected top-up.';
+  return '<b>'+money(left)+'</b> left after day one. With wages, covers '+(yrs<1?'under 1 year':yrs+(yrs===1?' year':' years'))+' of projected top-ups.';
 }
 $("copyList").addEventListener("click",()=>{
   const c=R;
@@ -955,13 +954,13 @@ function restart(){
 $("next").addEventListener("click",forward);
 
 /* ---------- the adviser's set-up: every figure in one place ---------- */
-const SRC={bal:"",keep:"Not used for this purchase",contrib:"After contributions tax",topYears:"Brochure minimum term is 5 years",yieldPct:"brochure|4.5% of price after costs",price:"",landValue:"Dual contract only",dep:"Of the price",
+const SRC={bal:"",wage:"All members, before tax",sgPct:"Super guarantee rate",yieldPct:"brochure|4.5% of price after costs",price:"",landValue:"Dual contract only",dep:"Of the price",
   rate:"brochure|7.25% for the full term",loanYears:"brochure|25 years, principal and interest",
   lender:"est",other:"est",setup:"brochure|ARG partner fee, $3,500 + GST, p.12",
   rent:"After costs. Default 4.5% of price",rg:"brochure|3% a year",annual:"brochure|$4,500 + GST a year, p.12",
   growth:"Not guaranteed",years:"",windUp:"brochure|0.55% of gross asset value, p.12"};
 const GROUPS=[
-  ["Borrowing capacity",["bal","keep","contrib","topYears","yieldPct","=cap","=capLoan","=capLimit"]],
+  ["Borrowing capacity",["bal","wage","sgPct","=serv","yieldPct","=cap","=capLoan","=capLimit"]],
   ["Property",["price","=state","=dutyOn","landValue"]],
   ["Deposit and loan",["dep","=loan","rate","loanYears","=repay"]],
   ["Day-one costs",["=duty","setup","=reserve","lender","other","=day1"]],
@@ -969,9 +968,10 @@ const GROUPS=[
   ["Growth and exit",["growth","years","windUp","=windUpAmt"]]
 ];
 const CALC={
+  serv:()=>["Servicing a year",money(serv(S)),"Covers top-ups up to "+money(serv(S)/12)+" a month"],
   cap:()=>["Max property price",CAP.price?money(CAP.price):"None","Calculated"],
   capLoan:()=>["Max loan",money(CAP.loan),"Calculated"],
-  capLimit:()=>["Limited by",CAP.limit==="cash"?"Day-one cash":CAP.limit==="topups"?"Top-ups":"None","Calculated"],
+  capLimit:()=>["Limited by",CAP.limit==="cash"?"Day-one cash":CAP.limit==="topups"?"Servicing":"None","Calculated"],
   loan:()=>["Loan",money(R.loan),"Calculated"],
   repay:()=>["Repayments a month",money(R.repay),"Calculated"],
   duty:()=>["Stamp duty",money(R.duty),'<span class="tag law">Law</span>'+STATES[S.state].name+' rates'],
@@ -981,7 +981,7 @@ const CALC={
   windUpAmt:()=>["Wind-up fee",money(R.windUpAmt),"At year "+S.years+" value"]
 };
 // Each figure shows in its own units, so nobody reads 750000 or 7.25 without knowing what it is.
-const UNITS={bal:["$",""],contrib:["$","a year"],keep:["","%"],topYears:["","years"],yieldPct:["","%"],price:["$",""],landValue:["$",""],lender:["$",""],other:["$",""],setup:["$",""],annual:["$","a year"],
+const UNITS={bal:["$",""],wage:["$","a year"],sgPct:["","%"],yieldPct:["","%"],price:["$",""],landValue:["$",""],lender:["$",""],other:["$",""],setup:["$",""],annual:["$","a year"],
   rent:["$","a week"],dep:["","%"],rate:["","%"],growth:["","%"],rg:["","%"],windUp:["","%"],loanYears:["","years"],years:["","years"]};
 const fieldVal=k=>UNITS[k]&&UNITS[k][0]==="$"?money(S[k]):num(S[k]);
 function srcHtml(k){
