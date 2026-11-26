@@ -298,6 +298,57 @@ body.view-story .top,body.view-story .legal{max-width:640px}
 .rates .row span:last-child{white-space:normal;text-align:right;max-width:62%}
 .sheet .plain a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 
+/* export as PDF: the sheet's two name fields, and the report, which only shows when printing */
+.btn2.wide{justify-self:stretch;justify-content:center}
+.pform{display:grid;gap:12px;margin:8px 0 14px}
+.pform label{display:grid;gap:6px;font-size:15px;font-weight:500}
+.pform input{height:46px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:16px}
+.pform input:focus-visible{outline:2px solid var(--mid);outline-offset:0}
+.sheet .pill{width:100%;box-sizing:border-box}
+#report{display:none}
+@media print{
+  @page{size:A4;margin:12mm 13mm 14mm}
+  html,body{background:#fff!important}
+  body{padding:0!important;height:auto!important;overflow:visible!important}
+  body>*:not(#report){display:none!important}
+  #report{display:block!important;color:var(--ink);font-size:9.5pt;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rp-head{display:flex;align-items:center;gap:16px;background:var(--ink);color:#fff;border-radius:8px;padding:12px 16px}
+  .rp-head img{height:30px;width:auto}
+  .rp-head div{border-left:1px solid rgba(255,255,255,.25);padding-left:16px}
+  .rp-head h1{font-size:17pt;color:#fff}
+  .rp-head p{font-size:9.5pt;color:rgba(255,255,255,.8)}
+  .rp-meta{display:flex;flex-wrap:wrap;gap:4px 20px;margin:10px 2px 12px;color:var(--muted)}
+  .rp-meta b{color:var(--ink);font-weight:600}
+  .rp-key{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-bottom:14px}
+  .rp-key div{background:var(--soft);border-radius:6px;padding:8px 10px;display:grid;gap:3px;align-content:start}
+  .rp-key span{font-size:8pt;color:var(--muted);line-height:1.25}
+  .rp-key b{font-family:var(--serif);font-weight:500;font-size:14pt;line-height:1.1;font-variant-numeric:tabular-nums}
+  .rp-key small{display:block;font-family:var(--f);font-size:7.5pt;color:var(--muted)}
+  .rp-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+  #report section{break-inside:avoid;margin-bottom:12px}
+  #report section.rp-break{break-inside:auto;break-before:page}
+  #report h3{font-size:11.5pt;margin:0 0 4px;padding-bottom:4px;border-bottom:1.5px solid var(--ink)}
+  #report table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  #report table+table{margin-top:6px}
+  #report th,#report td{padding:4px 0;border-bottom:.5pt solid var(--line);vertical-align:top}
+  #report th{text-align:left;font-weight:400}
+  #report th small{display:block;font-size:7.5pt;color:var(--muted)}
+  #report td{text-align:right;font-weight:600;white-space:nowrap;padding-left:10px}
+  #report tr.total th,#report tr.total td{border-top:1.5px solid var(--ink);border-bottom:0;font-weight:600}
+  #report .none{color:var(--muted);font-weight:400}
+  .rp-years thead th,.rp-years thead td{font-size:8pt;color:var(--muted);font-weight:500}
+  .rp-years tr{break-inside:avoid}
+  .rp-years tbody td{font-weight:400}
+  .rp-years tbody td:last-child{font-weight:600}
+  .rp-note{margin-top:6px;font-size:8.5pt;color:var(--muted)}
+  .rp-note b{color:var(--ink)}
+  .rp-risks{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;font-size:8.5pt;color:var(--muted)}
+  .rp-risks b{color:var(--ink);font-weight:600}
+  .rp-legal{display:grid;gap:5px;font-size:7.5pt;line-height:1.4;color:var(--muted);margin-top:4px;break-inside:auto!important}
+  .rp-legal b{color:var(--ink)}
+  .rp-legal a{color:inherit;text-decoration:none}
+}
+
 </style>
 </head>
 <body>
@@ -396,6 +447,7 @@ body.view-story .top,body.view-story .legal{max-width:640px}
         <button class="link" type="button" data-sheet="fees">Fees</button>
         <button class="link" type="button" data-sheet="decide">Risks</button>
       </div>
+      <div class="copyrow"><button class="btn2" type="button" data-export>Export as PDF</button></div>
       <div class="agent">
         <h3>Apply</h3>
         <p>Read the PDS first. Applying takes about 12 minutes.</p>
@@ -426,6 +478,7 @@ body.view-story .top,body.view-story .legal{max-width:640px}
         <div class="slots"><button class="btn2" type="button" data-save="A">Save A</button><button class="btn2" type="button" data-save="B">Save B</button></div>
         <div id="compare"><p class="note">Save two versions to compare them.</p></div>
       </div>
+      <button class="btn2 wide" type="button" data-export>Export as PDF</button>
       <div class="copyrow"><button class="btn2" type="button" id="copyBroker">Copy summary for broker</button><span class="note" id="copyBrokerStatus" role="status"></span></div>
       <button class="btn2 reset" type="button" id="resetFees">Reset to brochure figures</button>
       <button class="pill" type="button" id="walk">Show the client</button>
@@ -437,6 +490,8 @@ body.view-story .top,body.view-story .legal{max-width:640px}
   <p>Illustrative only. Figures follow the Residential Property Fund brochure for Australian Residential Group (ARG) partners, based on the Product Disclosure Statement dated 13 October 2026, and the assumptions you set: a fixed interest rate for the full term, rent after property costs rising each year, fees unchanged and full occupancy. Stamp duty uses each state’s general rates for an investment property (non-owner-occupier rates in the ACT), with no concessions or surcharges. Tax, vacancy, sale costs and the wind-up fee are left out unless shown. Borrowing capacity is an estimate; the fund’s servicing calculation and the lender decide what can be borrowed. Your SMSF holds units in the fund, not the property, and its return depends on both Classes (about 49% Single Property Class, 51% SMSF Property Class), fees and tax. Past growth is not a reliable indicator of future growth. Values can fall and you can lose money. The setup, annual and wind-up fees are exclusive fees for ARG partners; fund fees and costs are set out in the PDS.</p>
   <p>General information only. It does not take into account your objectives, financial situation or needs. Read the Product Disclosure Statement (13 October 2026) and Target Market Determination at <a href="https://www.lonvera.com.au" target="_blank" rel="noopener">www.lonvera.com.au</a> and get independent financial, legal and tax advice before investing. Issued by Rajomon Capital Limited ACN 600 237 625, AFSL 465579, as responsible entity of the Rajomon Fund ARSN 664 946 801. Lonvera Pty Ltd ACN 654 721 043, Authorised Representative No. 1303714, is the investment manager.</p>
 </footer>
+
+<div id="report" aria-hidden="true"></div>
 
 <div class="backdrop" id="backdrop" hidden></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetH" hidden>
@@ -556,6 +611,7 @@ const SCREENS=["capacity","home","upfront","rent","years","result"];
 let cur=0, busy=false, R=null, CAP=null;
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $=id=>document.getElementById(id);
+const esc=t=>String(t).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
 const el=html=>{const t=document.createElement("template"); t.innerHTML=html.trim(); return t.content.firstElementChild;};
 
 /* ---------- money ---------- */
@@ -709,6 +765,7 @@ document.addEventListener("click",e=>{
   if(mini&&openChip){const d=mini.dataset.mini; set(openChip,S[openChip]+(+d)*META[openChip].step); const again=document.querySelector('[data-mini="'+d+'"]'); if(again) again.focus(); return;}
   const opt=e.target.closest("[data-opt]");
   if(opt){set(opt.dataset.opt,+opt.dataset.v); const again=document.querySelector('[data-opt="'+opt.dataset.opt+'"][data-v="'+opt.dataset.v+'"]'); if(again) again.focus(); return;}
+  if(e.target.closest("[data-export]")){exportSheet(); return;}
   const sh=e.target.closest("[data-sheet]");
   if(sh){openSheet(sh.dataset.sheet); return;}
   const jump=e.target.closest("[data-jump]");
@@ -729,7 +786,6 @@ function update(){
   paintSteppers(); paintChips(); paintOpts();
   CAP=capacity(S);
   put($("capFig"),CAP.price?money(CAP.price):"None");
-  const esc=t=>String(t).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
   if(CAP.quote) put($("capSay"),CAP.price
     ?'Lender quote'+(S.lenderName?' from <b>'+esc(S.lenderName)+'</b>':'')+': up to <b>'+money(S.qLoan)+'</b> at '+num(S.qRate)+'% over '+S.qYears+' years. Servicing set by the lender.<br>At the max: loan <b>'+money(CAP.loan)+'</b> ('+num(Math.round(CAP.lvr))+'% LVR). Repayments <b>'+money(CAP.repay)+'</b> a month. Day one <b>'+money(CAP.day1)+'</b>.'
     :'The balance doesn\'t cover day one with this loan.');
@@ -849,6 +905,98 @@ $("copyBroker").addEventListener("click",()=>{
   const text=brokerSummary();
   try{ navigator.clipboard.writeText(text).then(()=>{$("copyBrokerStatus").textContent="Copied.";},()=>openText(text,"Summary for broker")); }catch(err){ openText(text,"Summary for broker"); }
 });
+/* ---------- export as PDF: an A4 report of the figures on screen. The browser's print window saves it as a PDF. ---------- */
+// Names typed here stay in this tab: they go into the report and the file name, nowhere else.
+const PREP={for:"",by:""};
+function reportHtml(){
+  const c=R, e=eff(S), m=c.m1, sv=servicing(S,c), pct=v=>num(Math.round(v*10)/10);
+  const date=new Date().toLocaleDateString("en-AU",{day:"numeric",month:"long",year:"numeric"});
+  const tr=(l,v,sub)=>'<tr><th>'+l+(sub?'<small>'+sub+'</small>':'')+'</th><td>'+v+'</td></tr>';
+  const table=(rows,total)=>'<table>'+rows.join("")+(total?'<tr class="total"><th>'+total[0]+'</th><td>'+total[1]+'</td></tr>':'')+'</table>';
+  const sec=(h,body,cls)=>'<section'+(cls?' class="'+cls+'"':'')+'><h3>'+h+'</h3>'+body+'</section>';
+  const plainSrc={deposit:"Calculated",duty:STATES[S.state].name+" general rates on "+money(c.dutiable)+(S.dutyOn==="land"?" (land)":""),
+    setup:S.edited.setup?"Your figure":"ARG partner fee, incl GST",reserve:"Brochure minimum for this price. Returned on exit."};
+  const dayRows=upfrontRows(c).map((r,i)=>{
+    const src=r.k?(S.edited[r.k]?"Your figure":"Not in brochure"):[plainSrc.deposit,plainSrc.duty,plainSrc.setup,plainSrc.reserve][i];
+    return tr(r.l,r.k&&!S.edited[r.k]?'<span class="none">Not included</span>':money(r.v),src);
+  });
+  const left=S.bal-c.day1;
+  const yrs=c.years.slice(0,S.years).map(y=>'<tr><th>'+y.y+'</th><td>'+money(y.value)+'</td><td>'+money(y.loan)+'</td><td>'+(y.top>0?money(y.top):"None")+'</td><td>'+money(y.value-y.loan)+'</td></tr>').join("");
+  const others=[0,3,6].filter(g=>g!==S.growth);
+  const missing=ESTIMATES.filter(k=>!S.edited[k]).map(k=>k==="lender"?"lender costs":"other transaction costs");
+  const net=c.equity-c.putIn;
+  const d=DUTY_INFO[S.state];
+  return '<header class="rp-head"><img src="'+document.querySelector(".top .logo").src+'" alt="ARG Property Management"><div><h1>Residential Property Fund</h1><p>Property scenario</p></div></header>'+
+    '<div class="rp-meta">'+(PREP.for?'<span>Prepared for <b>'+esc(PREP.for)+'</b></span>':'')+(PREP.by?'<span>Prepared by <b>'+esc(PREP.by)+'</b></span>':'')+'<span>'+date+'</span></div>'+
+    '<div class="rp-key">'+[["Property price",money(S.price)],["Day one from the SMSF",money(c.day1)],["Top-up, year 1",c.top1>0?money(c.top1)+'<small>a month</small>':"None"],["Total put in, "+S.years+" years",money(c.putIn)],["Equity after "+S.years+" years",money(c.equity)+'<small>at '+num(S.growth)+'% growth</small>']]
+      .map(([k,v])=>'<div><span>'+k+'</span><b>'+v+'</b></div>').join("")+'</div>'+
+    '<div class="rp-two">'+
+      sec("Property and loan",table([
+        tr("Price",money(S.price),STATES[S.state].name),
+        tr("Deposit",money(c.dep),pct(c.depPct)+"% of the price"),
+        tr("Loan",money(c.loan),pct(100-c.depPct)+"% LVR"+(S.quoteOn?", lender quote"+(S.lenderName?" from "+esc(S.lenderName):""):"")),
+        tr("Interest rate",num(e.rate)+"%",e.loanYears+" years, principal and interest"+(S.quoteOn?"":", fixed for the term")),
+        tr("Repayments",money(c.repay),"A month"),
+        tr("Rent",money(S.rent),"A week after property costs, rising "+num(S.rg)+"% a year"),
+        tr("Growth",num(S.growth)+"%","A year, not guaranteed")
+      ]))+
+      sec("Day-one costs",table(dayRows,["Total day one",money(c.day1)])+
+        table([tr("SMSF balance",money(S.bal)),tr(left<0?"Short for day one":"Left after day one",money(Math.abs(left)))]))+
+    '</div>'+
+    '<div class="rp-two">'+
+      sec("Year 1, a month",table([
+        tr("Rent",money(m.rent),"After property costs"),
+        tr("Loan repayment","−"+money(m.repay)),
+        tr("Annual fee","−"+money(m.fee),money(S.annual)+" a year")
+      ],[m.net<0?"Top-up from the SMSF":"Left over",money(Math.abs(m.net))])+'<p class="rp-note">'+cashLine(c)+'</p>')+
+      sec("After "+S.years+" years",table([
+        tr("Property value",money(c.end.value),num(S.growth)+"% growth a year"),
+        tr("Loan owing","−"+money(c.end.loan))
+      ],["Equity",money(c.equity)])+
+        table([tr("Total put in",money(c.putIn),money(c.day1)+" day one + "+money(c.cumTop)+" top-ups"),
+          tr("Equity minus total put in",(net>=0?"+":"−")+money(Math.abs(net)),"Before tax, sale costs and the wind-up fee")].concat(others.map(g=>tr("Equity at "+g+"% growth",money(c.equityAt(g)))))))+
+    '</div>'+
+    sec("Year by year",'<table class="rp-years"><thead><tr><th>Year</th><td>Property value</td><td>Loan owing</td><td>Top-ups</td><td>Equity</td></tr></thead><tbody>'+yrs+'</tbody></table>','rp-break')+
+    '<div class="rp-two">'+
+      sec("Fees",table([
+        tr("Setup fee",money(S.setup),"$1,100 paid at nomination"),
+        tr("Annual fee × "+S.years+" years",money(c.cumFee),money(S.annual)+" a year"),
+        tr("Wind-up fee",money(c.windUpAmt),num(S.windUp)+"% of asset value, if the Class is wound up")
+      ],["Total fees",money(S.setup+c.cumFee+c.windUpAmt)])+'<p class="rp-note">ARG partner fees, including GST. Full fees are in the PDS.</p>')+
+      sec("Borrowing guide",table(S.quoteOn?[
+        tr("Lender quote",money(S.qLoan),num(S.qRate)+"% over "+S.qYears+" years"+(S.lenderName?", "+esc(S.lenderName):"")),
+        tr("Max price with this loan",CAP.price?money(CAP.price):"None","Day-one costs within the SMSF balance")
+      ]:[
+        tr("Servicing income",money(sv.income),"Super "+money(sv.wages)+" + rent "+money(sv.rent)+", a year"),
+        tr("Servicing costs",money(sv.costs),"Repayments and annual fee, a year"),
+        tr("Max price on this guide",CAP.price?money(CAP.price):"None",CAP.limit==="cash"?"Limited by day-one cash":CAP.limit==="topups"?"Limited by servicing":"")
+      ])+'<p class="rp-note">An estimate, not a credit assessment. The fund\'s servicing calculation and the lender decide what can be borrowed.</p>')+
+    '</div>'+
+    sec("Risks",'<ul class="rp-risks">'+RISKS.map(([b,t])=>'<li><b>'+b+'</b> '+t+'</li>').join("")+'</ul>')+
+    '<section class="rp-legal">'+
+      (missing.length?'<p><b>Not included: '+missing.join(" and ")+'.</b> Add quotes before committing.</p>':'')+
+      '<p>Stamp duty: '+d.src+', '+d.url+' (checked 24 November 2026). '+d.note+'</p>'+
+      [...document.querySelectorAll(".legal p")].map(x=>'<p>'+x.innerHTML+'</p>').join("")+
+    '</section>';
+}
+const PAGE_TITLE=document.title;
+function buildReport(){
+  if(!R) return;
+  $("report").innerHTML=reportHtml();
+  const date=new Date().toLocaleDateString("en-AU",{day:"numeric",month:"short",year:"numeric"});
+  document.title=["ARG Residential Property Fund",money(S.price)+" "+S.state,PREP.for,date].filter(Boolean).join(" - ").replace(/[\\/:*?"<>|]/g,"");
+}
+addEventListener("beforeprint",buildReport);
+addEventListener("afterprint",()=>{ document.title=PAGE_TITLE; });
+function exportSheet(){
+  $("sheetH").textContent="Export as PDF";
+  $("sheetBody").innerHTML='<div class="pform"><label for="prepFor">Prepared for<input type="text" id="prepFor" maxlength="60" autocomplete="off"></label>'+
+    '<label for="prepBy">Prepared by<input type="text" id="prepBy" maxlength="60" autocomplete="off"></label></div>'+
+    '<p class="intro">In the print window, choose Save as PDF.</p><button class="pill" type="button" id="doPdf">Save as PDF</button>';
+  $("prepFor").value=PREP.for; $("prepBy").value=PREP.by;
+  $("doPdf").onclick=()=>{ PREP.for=$("prepFor").value.trim().slice(0,60); PREP.by=$("prepBy").value.trim().slice(0,60); closeSheet(); setTimeout(()=>window.print(),350); };
+  showSheet();
+}
 function openText(text,title){
   $("sheetH").textContent=title||"Copy this list";
   $("sheetBody").innerHTML='<p class="intro">Select the text and copy it.</p><textarea class="copybox" id="copyBox" readonly></textarea>';
@@ -1150,6 +1298,16 @@ $("vSetup").onclick=()=>view("setup");
 $("vStory").onclick=()=>view("story");
 $("walk").onclick=()=>view("story");
 
+const RISKS=[
+  ["Approval is not guaranteed","The fund and the lender both assess the property."],
+  ["You hold units","Your SMSF owns units in the fund, not the property."],
+  ["You can lose money","Returns and capital are not guaranteed."],
+  ["Top-ups may be needed","If they aren't made, the property may be sold."],
+  ["5-year minimum","After that, withdrawals only through withdrawal offers, which may be scaled back."],
+  ["Pooled properties","Losses on other pooled properties affect your pooled units."],
+  ["Cash reserve","$15,000 to $40,000 by price. Must be refilled if used."],
+  ["Check your SMSF","It must suit your trust deed and investment strategy."]
+];
 /* ---------- sheets ---------- */
 function rows(list,total){
   return '<div class="rows">'+list.map(([l,v,sub])=>'<div class="row"><span>'+l+(sub?'<small>'+sub+'</small>':'')+'</span><span>'+v+'</span></div>').join("")+(total?'<div class="row total"><span>'+total[0]+'</span><span>'+total[1]+'</span></div>':'')+'</div>';
@@ -1197,16 +1355,7 @@ function openSheet(k){
     '<ul class="plain"><li>ARG partner fees, including GST.</li><li>Stamp duty, lender and transaction costs are extra.</li><li>Fees may change. Full fees are in the PDS.</li></ul>';
   } else if(k==="decide"){
     h="Risks";
-    body='<ul class="points">'+[
-      ["Approval is not guaranteed","The fund and the lender both assess the property."],
-      ["You hold units","Your SMSF owns units in the fund, not the property."],
-      ["You can lose money","Returns and capital are not guaranteed."],
-      ["Top-ups may be needed","If they aren't made, the property may be sold."],
-      ["5-year minimum","After that, withdrawals only through withdrawal offers, which may be scaled back."],
-      ["Pooled properties","Losses on other pooled properties affect your pooled units."],
-      ["Cash reserve","$15,000 to $40,000 by price. Must be refilled if used."],
-      ["Check your SMSF","It must suit your trust deed and investment strategy."]
-    ].map(([b,t])=>'<li><b>'+b+'</b>'+t+'</li>').join("")+'</ul>';
+    body='<ul class="points">'+RISKS.map(([b,t])=>'<li><b>'+b+'</b>'+t+'</li>').join("")+'</ul>';
   }
   $("sheetH").textContent=h; $("sheetBody").innerHTML=body;
   showSheet();
