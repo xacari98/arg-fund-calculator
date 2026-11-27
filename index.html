@@ -8,9 +8,9 @@
 <meta name="description" content="Work through what a residential property held through the Residential Property Fund could cost your SMSF: the deposit, stamp duty, ARG partner fees and the cash reserve. Estimates before tax, not forecasts.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <style>
-/* Residential Property Fund calculator for ARG partners. The Bell Morgan fund cost calculator journey, in ARG's colours and type. */
+/* Residential Property Fund calculator. Default colours and type; a brand profile can override the :root variables. */
 :root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}
 /* Layout: one column. The little house and the story so far sit on top; one question at a time below them. The adviser's set-up is a second view of the same numbers. */
 :root{
@@ -35,6 +35,7 @@ button,input{font:inherit;color:inherit}
 /* top bar */
 .top{max-width:1120px;margin:0 auto 30px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px;flex-wrap:wrap;background:var(--ink);color:#fff;box-shadow:0 0 0 100vmax var(--ink);clip-path:inset(0 -100vmax)}
 .logo{height:34px;width:auto;display:block}
+.wordmark{font:400 26px/1 var(--f);letter-spacing:-.03em;color:#fff;white-space:nowrap}
 .product{font-size:14px;font-weight:500;color:rgba(255,255,255,.86);padding-left:18px;border-left:1px solid rgba(255,255,255,.22);line-height:1.3}
 .seg{display:inline-flex;flex-wrap:wrap;background:var(--soft);border-radius:10px;padding:4px;gap:4px;justify-self:start}
 .seg button{all:unset;cursor:pointer;padding:8px 14px;border-radius:7px;font-size:14px;font-weight:500;color:var(--muted);transition:background .2s ease,color .2s ease}
@@ -50,7 +51,7 @@ button,input{font:inherit;color:inherit}
 /* the journey: one column */
 .col{max-width:640px;margin:0 auto;display:grid;gap:26px}
 .topper{display:grid;grid-template-columns:132px minmax(0,1fr);gap:14px;align-items:start}
-.tile{width:132px;aspect-ratio:1;border-radius:16px;overflow:hidden;background:#DCE2E5}
+.tile{width:132px;aspect-ratio:1;border-radius:16px;overflow:hidden;background:var(--tile,#DCE2E5)}
 .tile svg{width:100%;height:100%;display:block}
 .story{background:var(--soft);border-radius:16px;padding:4px 18px;display:grid;overflow:hidden;align-content:start}
 .story:empty{display:none}
@@ -142,7 +143,7 @@ button,input{font:inherit;color:inherit}
 .cost .src{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:13px;color:var(--muted)}
 .cost .mini{grid-column:1/-1;margin-top:6px}
 .tag{display:inline-flex;align-items:center;border-radius:5px;padding:2px 9px;font-size:12px;font-weight:600;white-space:nowrap}
-.tag.pds,.tag.law,.tag.brochure,.tag.arg{background:var(--pale);color:var(--ink)}
+.tag.pds,.tag.law,.tag.brochure,.tag.fee{background:var(--pale);color:var(--ink)}
 .tag.calc{background:var(--soft);color:var(--ink)}
 .tag.est{background:var(--lamp);color:var(--ink)}
 .tag.yours{background:var(--surface);color:var(--ink);box-shadow:inset 0 0 0 1px var(--mid)}
@@ -152,7 +153,7 @@ button,input{font:inherit;color:inherit}
 .cost.total .l{font-weight:600;font-size:17px}
 .cost.total .v{font-size:clamp(26px,3vw,32px);font-weight:500;letter-spacing:-.025em}
 .notice{display:flex;gap:10px;align-items:flex-start;background:var(--soft);border-radius:12px;padding:12px 14px;font-size:14.5px}
-.notice i{flex:none;width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--lamp);box-shadow:0 0 0 3px #FBEEDB}
+.notice i{flex:none;width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--lamp);box-shadow:0 0 0 3px var(--lamp-soft,#FBEEDB)}
 .notice.done i{background:var(--slate);box-shadow:0 0 0 3px var(--pale)}
 .cash{display:grid;gap:8px}
 .cash label{font-size:15px;font-weight:500}
@@ -255,7 +256,7 @@ body.view-story .top,body.view-story .legal{max-width:640px}
   body.phone .product{font-size:13px;padding-left:12px}
   body.phone .top .seg{display:none}
   body.phone #storyView .col{display:block}
-  body.phone .topper{position:fixed;left:0;right:0;top:56px;bottom:0;padding:8px 18px 0;grid-template-columns:80px minmax(0,1fr);gap:12px;align-content:start;background:linear-gradient(#E8EBEC,#F6F7F8 50dvh)}
+  body.phone .topper{position:fixed;left:0;right:0;top:56px;bottom:0;padding:8px 18px 0;grid-template-columns:80px minmax(0,1fr);gap:12px;align-content:start;background:linear-gradient(var(--top-a,#E8EBEC),var(--top-b,#F6F7F8) 50dvh)}
   body.phone .tile{width:80px;border-radius:12px}
   body.phone .story{background:none;padding:0;border-radius:0;gap:0}
   body.phone .story.clipped{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;-webkit-mask-image:linear-gradient(transparent,#000 12px);mask-image:linear-gradient(transparent,#000 12px)}
@@ -314,6 +315,7 @@ body.view-story .top,body.view-story .legal{max-width:640px}
   #report{display:block!important;color:var(--ink);font-size:9.5pt;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .rp-head{display:flex;align-items:center;gap:16px;background:var(--ink);color:#fff;border-radius:8px;padding:12px 16px}
   .rp-head img{height:30px;width:auto}
+  .rp-mark{font:400 20pt/1 var(--f);letter-spacing:-.03em;color:#fff}
   .rp-head div{border-left:1px solid rgba(255,255,255,.25);padding-left:16px}
   .rp-head h1{font-size:17pt;color:#fff}
   .rp-head p{font-size:9.5pt;color:rgba(255,255,255,.8)}
@@ -543,15 +545,15 @@ body.view-story .top,body.view-story .legal{max-width:640px}
 
 </script>
 <script>
-// Residential Property Fund calculator, ARG partner fees. Same journey as the Bell Morgan fund cost calculator;
-// every figure follows the Lonvera brochure for ARG partners (PDS dated 13 October 2026). Runs after the GSAP files.
+// Residential Property Fund calculator. One engine for every partner brand: the fees, wording and legal text come from
+// BRAND, a profile in brands/*.json that bundle.py writes in at build time. Runs after the GSAP files.
 (()=>{
 "use strict";
 gsap.registerPlugin(Flip,SplitText);
-/* From the Residential Property Fund brochure for ARG partners (fees include GST). Setup fee: $3,750 incl GST, as advised by ARG
-   on 24 Nov 2026 (the brochure showed $3,500 + GST). Admins can change each in "Set it up". */
-const BROCHURE={setup:3750,annual:4950,windUp:.55,rate:7.25,loanYears:25,rg:3,dep:30};
-const NOMINATION_PART=1100;                 // of the setup fee, paid at nomination (p.12)
+const BRAND={"id": "arg", "page": {"logoAlt": "ARG Property Management"}, "brochure": {"setup": 3750, "annual": 4950, "windUp": 0.55, "rate": 7.25, "loanYears": 25, "rg": 3, "dep": 30, "nomination": 1100}, "copy": {"feeTag": "ARG", "setupHint": "ARG partner fee", "setupPlain": "ARG partner fee, incl GST", "setupIncludes": "Includes conveyancing, legal advice and entity setup.", "feePage": "p.12", "feesNote": "ARG partner fees, including GST.", "source": "Residential Property Fund brochure for ARG partners (PDS dated 13 October 2026)", "pdfName": "ARG Residential Property Fund"}};                      // the partner profile (brands/*.json), written in by bundle.py
+/* Fees (incl GST) and loan figures from the brand's brochure. Admins can change each in "Set it up". */
+const BROCHURE=BRAND.brochure, COPY=BRAND.copy;
+const NOMINATION_PART=BROCHURE.nomination;  // of the setup fee, paid at nomination
 const RENT_YIELD=.045;                      // rent after property costs, 4.5% of the price (p.9)
 /* Minimum cash reserve by purchase price (p.8) */
 function reserveFor(p){ return p<=600000?15000:p<=900000?20000:p<=1300000?30000:40000; }
@@ -821,13 +823,13 @@ function update(){
 }
 
 /* ---------- up front: every cost, and where each figure comes from ---------- */
-const TAGS={arg:"ARG",brochure:"Brochure",law:"Law",calc:"Calculated",est:"Not in brochure",yours:"Your figure"};
+const TAGS={fee:COPY.feeTag,brochure:"Brochure",law:"Law",calc:"Calculated",est:"Not in brochure",yours:"Your figure"};
 function upfrontRows(c){
   const changed=k=>S.edited[k]?"yours":"brochure";
   return [
     {l:"Deposit ("+num(Math.round(c.depPct*10)/10)+"%)",v:c.dep,tag:"calc",src:""},
     {l:"Stamp duty",v:c.duty,tag:"law",src:STATES[S.state].name+" general rates"+(S.state==="ACT"?" (investor)":"")+" on "+money(c.dutiable)+(S.dutyOn==="land"?" (land).":".")+' <button class="link" type="button" data-sheet="duty">Rates and source</button>'},
-    {l:"Setup fee",v:S.setup,tag:S.edited.setup?"yours":"arg",src:"$3,750 incl GST. Includes conveyancing, legal advice and entity setup. $1,100 paid at nomination."},
+    {l:"Setup fee",v:S.setup,tag:S.edited.setup?"yours":"fee",src:money(BROCHURE.setup)+" incl GST. "+COPY.setupIncludes+" "+money(NOMINATION_PART)+" paid at nomination."},
     {l:"Cash reserve",v:c.reserve,tag:"brochure",src:"Minimum for this price. Returned on exit."},
     {k:"lender",l:"Lender costs",src:"Loan setup, valuation, mortgage fees."},
     {k:"other",l:"Other transaction costs",src:"Registration and settlement costs."}
@@ -867,7 +869,7 @@ $("copyList").addEventListener("click",()=>{
       "Unit purchases in year 1: about "+money(c.top1)+" a month",
       "Unit purchases over "+S.years+" years: about "+money(c.cumTop),
       "Put in over "+S.years+" years: about "+money(c.putIn),"",
-      "Fees follow the Residential Property Fund brochure for ARG partners (PDS dated 13 October 2026). Stamp duty uses "+STATES[S.state].name+" general rates. Add a quote for lender and other transaction costs. General information only, before tax."]).join("\n");
+      "Fees follow the "+COPY.source+". Stamp duty uses "+STATES[S.state].name+" general rates. Add a quote for lender and other transaction costs. General information only, before tax."]).join("\n");
   try{ navigator.clipboard.writeText(text).then(()=>{$("copyStatus").textContent="Copied.";},()=>openText(text)); }catch(err){ openText(text); }
 });
 // Plain-text summary a broker can paste into their own servicing and comparison tools.
@@ -899,7 +901,7 @@ function brokerSummary(){
     "Income: "+money(sv.income)+" a year (super "+money(sv.wages)+" + rent "+money(sv.rent)+")",
     "Costs: "+money(sv.costs)+" a year (repayments at "+num(e.rate)+"% + annual fee)",
     (S.quoteOn?"Max price with this loan and balance: ":"Max price on this guide: ")+(CAP.price?money(CAP.price):"none"),"",
-    "Fees: Residential Property Fund brochure for ARG partners (PDS dated 13 October 2026). Estimates before tax. Not a credit assessment: the lender decides."]).join("\n");
+    "Fees: "+COPY.source+". Estimates before tax. Not a credit assessment: the lender decides."]).join("\n");
 }
 $("copyBroker").addEventListener("click",()=>{
   const text=brokerSummary();
@@ -915,7 +917,7 @@ function reportHtml(){
   const table=(rows,total)=>'<table>'+rows.join("")+(total?'<tr class="total"><th>'+total[0]+'</th><td>'+total[1]+'</td></tr>':'')+'</table>';
   const sec=(h,body,cls)=>'<section'+(cls?' class="'+cls+'"':'')+'><h3>'+h+'</h3>'+body+'</section>';
   const plainSrc={deposit:"Calculated",duty:STATES[S.state].name+" general rates on "+money(c.dutiable)+(S.dutyOn==="land"?" (land)":""),
-    setup:S.edited.setup?"Your figure":"ARG partner fee, incl GST",reserve:"Brochure minimum for this price. Returned on exit."};
+    setup:S.edited.setup?"Your figure":COPY.setupPlain,reserve:"Brochure minimum for this price. Returned on exit."};
   const dayRows=upfrontRows(c).map((r,i)=>{
     const src=r.k?(S.edited[r.k]?"Your figure":"Not in brochure"):[plainSrc.deposit,plainSrc.duty,plainSrc.setup,plainSrc.reserve][i];
     return tr(r.l,r.k&&!S.edited[r.k]?'<span class="none">Not included</span>':money(r.v),src);
@@ -926,7 +928,7 @@ function reportHtml(){
   const missing=ESTIMATES.filter(k=>!S.edited[k]).map(k=>k==="lender"?"lender costs":"other transaction costs");
   const net=c.equity-c.putIn;
   const d=DUTY_INFO[S.state];
-  return '<header class="rp-head"><img src="'+document.querySelector(".top .logo").src+'" alt="ARG Property Management"><div><h1>Residential Property Fund</h1><p>Property scenario</p></div></header>'+
+  return '<header class="rp-head">'+(LOGO?'<img src="'+LOGO.src+'" alt="'+esc(BRAND.page.logoAlt)+'">':'<b class="rp-mark">'+esc(BRAND.page.logoAlt)+'</b>')+'<div><h1>Residential Property Fund</h1><p>Property scenario</p></div></header>'+
     '<div class="rp-meta">'+(PREP.for?'<span>Prepared for <b>'+esc(PREP.for)+'</b></span>':'')+(PREP.by?'<span>Prepared by <b>'+esc(PREP.by)+'</b></span>':'')+'<span>'+date+'</span></div>'+
     '<div class="rp-key">'+[["Property price",money(S.price)],["Day one from the SMSF",money(c.day1)],["Top-up, year 1",c.top1>0?money(c.top1)+'<small>a month</small>':"None"],["Total put in, "+S.years+" years",money(c.putIn)],["Equity after "+S.years+" years",money(c.equity)+'<small>at '+num(S.growth)+'% growth</small>']]
       .map(([k,v])=>'<div><span>'+k+'</span><b>'+v+'</b></div>').join("")+'</div>'+
@@ -959,10 +961,10 @@ function reportHtml(){
     sec("Year by year",'<table class="rp-years"><thead><tr><th>Year</th><td>Property value</td><td>Loan owing</td><td>Top-ups</td><td>Equity</td></tr></thead><tbody>'+yrs+'</tbody></table>','rp-break')+
     '<div class="rp-two">'+
       sec("Fees",table([
-        tr("Setup fee",money(S.setup),"$1,100 paid at nomination"),
+        tr("Setup fee",money(S.setup),money(NOMINATION_PART)+" paid at nomination"),
         tr("Annual fee × "+S.years+" years",money(c.cumFee),money(S.annual)+" a year"),
         tr("Wind-up fee",money(c.windUpAmt),num(S.windUp)+"% of asset value, if the Class is wound up")
-      ],["Total fees",money(S.setup+c.cumFee+c.windUpAmt)])+'<p class="rp-note">ARG partner fees, including GST. Full fees are in the PDS.</p>')+
+      ],["Total fees",money(S.setup+c.cumFee+c.windUpAmt)])+'<p class="rp-note">'+COPY.feesNote+' Full fees are in the PDS.</p>')+
       sec("Borrowing guide",table(S.quoteOn?[
         tr("Lender quote",money(S.qLoan),num(S.qRate)+"% over "+S.qYears+" years"+(S.lenderName?", "+esc(S.lenderName):"")),
         tr("Max price with this loan",CAP.price?money(CAP.price):"None","Day-one costs within the SMSF balance")
@@ -979,12 +981,12 @@ function reportHtml(){
       [...document.querySelectorAll(".legal p")].map(x=>'<p>'+x.innerHTML+'</p>').join("")+
     '</section>';
 }
-const PAGE_TITLE=document.title;
+const PAGE_TITLE=document.title, LOGO=document.querySelector(".top .logo");
 function buildReport(){
   if(!R) return;
   $("report").innerHTML=reportHtml();
   const date=new Date().toLocaleDateString("en-AU",{day:"numeric",month:"short",year:"numeric"});
-  document.title=["ARG Residential Property Fund",money(S.price)+" "+S.state,PREP.for,date].filter(Boolean).join(" - ").replace(/[\\/:*?"<>|]/g,"");
+  document.title=[COPY.pdfName,money(S.price)+" "+S.state,PREP.for,date].filter(Boolean).join(" - ").replace(/[\\/:*?"<>|]/g,"");
 }
 addEventListener("beforeprint",buildReport);
 addEventListener("afterprint",()=>{ document.title=PAGE_TITLE; });
@@ -1007,17 +1009,19 @@ function openText(text,title){
 /* ---------- the little house: one block for every answer, the window lights at the end ---------- */
 const House=(()=>{
   const BASE=172, BH=16, U=80;
-  const B=[[70,"#f1f3f4","#ffffff"],[84,"#dde3e5","#eef1f2"],[98,"#c2ccd0","#d8dfe2"],[112,"#8d9ca2","#a9b5ba"],[126,"#485b63","#5f727a"],[140,"#1d323c","#34474f"]];
+  const HC=Object.assign({blocks:[["#f1f3f4","#ffffff"],["#dde3e5","#eef1f2"],["#c2ccd0","#d8dfe2"],["#8d9ca2","#a9b5ba"],["#485b63","#5f727a"],["#1d323c","#34474f"]],
+    body:"#485b63",roof:"#cd2028",dark:"#1d323c",base:["#dfe4e6","#f4f6f7"]},BRAND.house);  // the brand can recolour the house
+  const B=HC.blocks.map((c,i)=>[70+14*i,c[0],c[1]]);
   const GLASS=[29,50,60], LIT=[255,196,110];
   const mix=(a,b,k)=>"rgb("+a.map((v,i)=>Math.round(v+(b[i]-v)*k)).join(",")+")";
   $("tile").innerHTML='<svg viewBox="0 0 200 200" aria-hidden="true"><defs><clipPath id="hAbove"><rect width="200" height="'+BASE+'"/></clipPath>'+
     '<radialGradient id="hGlowG"><stop offset="0" stop-color="#ffc46e" stop-opacity=".9"/><stop offset="1" stop-color="#ffc46e" stop-opacity="0"/></radialGradient></defs>'+
-    '<rect x="40" y="166" width="120" height="26" rx="6" fill="#dfe4e6"/><rect x="40" y="166" width="120" height="9" rx="4.5" fill="#f4f6f7"/>'+
+    '<rect x="40" y="166" width="120" height="26" rx="6" fill="'+HC.base[0]+'"/><rect x="40" y="166" width="120" height="9" rx="4.5" fill="'+HC.base[1]+'"/>'+
     '<g clip-path="url(#hAbove)">'+B.map(([w,front,top])=>'<g data-b><rect width="'+w+'" height="'+BH+'" rx="5" fill="'+front+'"/><rect width="'+w+'" height="5" rx="2.5" fill="'+top+'"/></g>').join("")+'</g>'+
-    '<ellipse id="hShadow" cx="100" rx="22" ry="2.5" fill="#1d323c" opacity=".2"/>'+
+    '<ellipse id="hShadow" cx="100" rx="22" ry="2.5" fill="'+HC.dark+'" opacity=".2"/>'+
     '<g id="hHouse"><circle cx="6" cy="-20" r="30" fill="url(#hGlowG)" id="hGlow" opacity="0"/>'+
-    '<path d="M-21 0V-23L0-41L21-23V0Z" fill="#485b63" stroke="#485b63" stroke-width="3" stroke-linejoin="round"/><path d="M-25-21L0-43L25-21" fill="none" stroke="#cd2028" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>'+
-    '<rect id="hWin" x=".5" y="-25" width="10.8" height="10.6" rx="1.5"/><rect x="-12.7" y="-14.4" width="7.8" height="14.4" rx="1" fill="#1d323c"/></g></svg>';
+    '<path d="M-21 0V-23L0-41L21-23V0Z" fill="'+HC.body+'" stroke="'+HC.body+'" stroke-width="3" stroke-linejoin="round"/><path d="M-25-21L0-43L25-21" fill="none" stroke="'+HC.roof+'" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>'+
+    '<rect id="hWin" x=".5" y="-25" width="10.8" height="10.6" rx="1.5"/><rect x="-12.7" y="-14.4" width="7.8" height="14.4" rx="1" fill="'+HC.dark+'"/></g></svg>';
   const blocks=[...$("tile").querySelectorAll("[data-b]")];
   const house=$("hHouse"), win=$("hWin"), glow=$("hGlow"), shadow=$("hShadow");
   const s={e:[0,0,0,0,0,0],hop:0,tilt:0,sq:0,lit:0};
@@ -1191,10 +1195,10 @@ $("next").addEventListener("click",forward);
 
 /* ---------- the adviser's set-up: every figure in one place ---------- */
 const SRC={bal:"",wage:"All members, before tax",sgPct:"Super guarantee rate",price:"",landValue:"Dual contract only",dep:"Of the price",
-  rate:"brochure|7.25% for the full term",loanYears:"brochure|25 years, principal and interest",
-  lender:"est",other:"est",setup:"arg|ARG partner fee, $3,750 incl GST",
-  rent:"After costs. Brochure example $649 (4.5% of $750,000)",rg:"brochure|3% a year",annual:"brochure|$4,500 + GST a year, p.12",
-  growth:"Not guaranteed",years:"",windUp:"brochure|0.55% of gross asset value, p.12",
+  rate:"brochure|"+num(BROCHURE.rate)+"% for the full term",loanYears:"brochure|"+BROCHURE.loanYears+" years, principal and interest",
+  lender:"est",other:"est",setup:"fee|"+COPY.setupHint+", "+money(BROCHURE.setup)+" incl GST",
+  rent:"After costs. Brochure example $649 (4.5% of $750,000)",rg:"brochure|"+num(BROCHURE.rg)+"% a year",annual:"brochure|"+money(BROCHURE.annual/1.1)+" + GST a year, "+COPY.feePage,
+  growth:"Not guaranteed",years:"",windUp:"brochure|"+num(BROCHURE.windUp)+"% of gross asset value, "+COPY.feePage,
   qLoan:"Approved by the lender",qRate:"From the quote",qYears:"From the quote, principal and interest"};
 const GROUPS=[
   ["Lender quote",["=quoteOn","=lenderName","qLoan","qRate","qYears"]],
@@ -1229,7 +1233,7 @@ function srcHtml(k){
   const v=SRC[k]||"";
   if(S.quoteOn&&(k==="rate"||k==="loanYears")) return 'Not used: lender quote on';
   if(v==="est") return S.edited[k]?'<span class="tag yours">Your figure</span>':'<span class="tag est">Not in brochure</span>Enter a quote';
-  if(v.startsWith("arg|")) return S.edited[k]?'<span class="tag yours">Changed</span>ARG: '+v.slice(4):'<span class="tag arg">ARG</span>'+v.slice(4);
+  if(v.startsWith("fee|")) return S.edited[k]?'<span class="tag yours">Changed</span>'+COPY.feeTag+': '+v.slice(4):'<span class="tag fee">'+COPY.feeTag+'</span>'+v.slice(4);
   if(v.startsWith("brochure|")) return S.edited[k]?'<span class="tag yours">Changed</span>Brochure: '+v.slice(9):'<span class="tag brochure">Brochure</span>'+v.slice(9);
   return v;
 }
@@ -1348,11 +1352,11 @@ function openSheet(k){
   } else if(k==="fees"){
     h="Fees";
     body=rows([
-      ["Setup fee",money(S.setup),"$1,100 paid at nomination"],
+      ["Setup fee",money(S.setup),money(NOMINATION_PART)+" paid at nomination"],
       ["Annual fee × "+S.years+" years",money(c.cumFee),money(S.annual)+" a year"],
       ["Wind-up fee",money(c.windUpAmt),num(S.windUp)+"% of asset value, if the Class is wound up"]
     ],["Total fees",money(S.setup+c.cumFee+c.windUpAmt)])+
-    '<ul class="plain"><li>ARG partner fees, including GST.</li><li>Stamp duty, lender and transaction costs are extra.</li><li>Fees may change. Full fees are in the PDS.</li></ul>';
+    '<ul class="plain"><li>'+COPY.feesNote+'</li><li>Stamp duty, lender and transaction costs are extra.</li><li>Fees may change. Full fees are in the PDS.</li></ul>';
   } else if(k==="decide"){
     h="Risks";
     body='<ul class="points">'+RISKS.map(([b,t])=>'<li><b>'+b+'</b>'+t+'</li>').join("")+'</ul>';
